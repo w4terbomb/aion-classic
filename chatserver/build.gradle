@@ -1,0 +1,39 @@
+plugins {
+    id 'com.aionemu.java-application-conventions'
+}
+
+dependencies {
+    implementation project(':commons')
+
+    implementation group: 'org.jboss.netty', name: 'netty', version: '3.2.7.Final'
+    implementation group: 'com.google.inject', name: 'guice', version: '2.0'
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'com.aionemu.chatserver.ChatServer'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Revision': '1.0',
+                'Date': new Date(),
+                'Main-Class': application.mainClass,
+        )
+    }
+    archiveBaseName = 'chatserver'
+}
+
+startScripts.enabled = false
+
+distributions {
+    main {
+        contents {
+            from 'dist'
+            into('config') {
+                from 'config'
+            }
+        }
+    }
+}

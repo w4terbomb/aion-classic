@@ -1,0 +1,38 @@
+plugins {
+    id 'com.aionemu.java-application-conventions'
+}
+
+dependencies {
+    implementation project(':commons')
+
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.30'
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'com.aionemu.loginserver.LoginServer'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Revision': '1.0',
+                'Date': new Date(),
+                'Main-Class': application.mainClass,
+        )
+    }
+    archiveBaseName = 'loginserver'
+}
+
+startScripts.enabled = false
+
+distributions {
+    main {
+        contents {
+            from 'dist'
+            into('config') {
+                from 'config'
+            }
+        }
+    }
+}

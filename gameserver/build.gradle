@@ -1,0 +1,72 @@
+plugins {
+    id 'com.aionemu.java-application-conventions'
+    id 'idea'
+}
+
+repositories {
+    flatDir {
+        dirs("../depend")
+    }
+}
+
+dependencies {
+    implementation project(':commons')
+
+    implementation group: 'net.sourceforge.findbugs', name: 'jsr305', version: '1.3.7'
+    implementation group: 'com.google.guava', name: 'guava', version: '18.0'
+    implementation group: 'javolution', name: 'javolution', version: '5.5.1'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.1.2'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.4'
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    implementation group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+    implementation group: 'joda-time', name: 'joda-time', version: '2.1'
+    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.2.1'
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.30'
+    implementation group: 'cglib', name: 'cglib-nodep', version: '2.2.2'
+    implementation group: 'org.objenesis', name: 'objenesis', version: '1.2'
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'com.aionemu.gameserver.GameServer'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'data/scripts/system/handlers'
+        }
+    }
+}
+
+jar {
+    include('com/aionemu/gameserver/**')
+
+    manifest {
+        attributes(
+                'Revision': '1.0',
+                'Date': new Date(),
+                'Main-Class': application.mainClass,
+        )
+    }
+    archiveBaseName = 'gameserver'
+}
+
+startScripts.enabled = false
+
+distributions {
+    main {
+        contents {
+            from 'dist'
+            into('config') {
+                from 'config'
+            }
+            into('data') {
+                from 'data'
+            }
+        }
+    }
+}
