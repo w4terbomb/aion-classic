@@ -1,7 +1,6 @@
 package com.aionemu.gameserver.model;
 
-public enum EmotionType
-{
+public enum EmotionType {
 	UNK(-1),
 	SELECT_TARGET(0),
 	JUMP(1),
@@ -22,7 +21,7 @@ public enum EmotionType
 	RIDE_END(16),
 	DIE(18),
 	RESURRECT(19),
-	ARENA_OF_TENACITY_UNK(20),//5.3
+	ARENA_OF_TENACITY_UNK(20), // 5.3
 	EMOTE(21),
 	END_DUEL(22), // What? Duel? It's the end of a emote
 	ATTACKMODE(24), // Attack mode, by game
@@ -42,6 +41,7 @@ public enum EmotionType
 	END_LOOT(41),
 	START_QUESTLOOT(42),
 	END_QUESTLOOT(43),
+	GLIDE(48),
 	START_FEEDING(50),
 	END_FEEDING(51),
 	WINDSTREAM_STRAFE(52),
@@ -53,17 +53,17 @@ public enum EmotionType
 	PET_EMOTION_2(121),
 	PET_EMOTION_3(122),
 	PET_EMOTION_4(123);
-	
+
 	private int id;
-	
+
 	private EmotionType(int id) {
 		this.id = id;
 	}
-	
+
 	public int getTypeId() {
 		return id;
 	}
-	
+
 	public static EmotionType getEmotionTypeById(int id) {
 		for (EmotionType emotionType : values()) {
 			if (emotionType.getTypeId() == id)
