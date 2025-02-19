@@ -5,16 +5,16 @@ import com.aionemu.gameserver.controllers.observer.ObserverType;
 import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.state.CreatureState;
+import com.aionemu.gameserver.model.templates.zone.ZoneType;
 import com.aionemu.gameserver.network.aion.serverpackets.S_ACTION;
 import com.aionemu.gameserver.network.aion.serverpackets.S_STATUS;
 import com.aionemu.gameserver.skillengine.effect.AbnormalState;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 
-public class FlyController
-{
+public class FlyController {
 	private static final long FLY_REUSE_TIME = 10000;
 	private Player player;
-	
+
 	private ActionObserver glideObserver = new ActionObserver(ObserverType.ABNORMALSETTED) {
 		@Override
 		public void abnormalsetted(AbnormalState state) {
@@ -23,11 +23,21 @@ public class FlyController
 			}
 		}
 	};
-	
+
+	private ActionObserver hybridObserver = new ActionObserver(ObserverType.MOVE) {
+		@Override
+		public void moved() {
+			if (!player.isInsideZoneType(ZoneType.FLY)) {
+				player.unsetState(CreatureState.FLYING);
+				PacketSendUtility.broadcastPacket(player, new S_ACTION(player, EmotionType.GLIDE, 0, 0), true);
+			}
+		}
+	};
+
 	public FlyController(Player player) {
 		this.player = player;
 	}
-	
+
 	public void onStopGliding(boolean removeWings) {
 		if (player.isInState(CreatureState.GLIDING)) {
 			player.unsetState(CreatureState.GLIDING);
@@ -42,10 +52,11 @@ public class FlyController
 			}
 			player.getGameStats().updateStatsAndSpeedVisually();
 			player.getObserveController().removeObserver(glideObserver);
+			player.getObserveController().removeObserver(hybridObserver);
 			PacketSendUtility.sendPacket(player, new S_STATUS(player));
 		}
 	}
-	
+
 	public void endFly(boolean forceEndFly) {
 		if (player.isInState(CreatureState.FLYING) || player.isInState(CreatureState.GLIDING)) {
 			player.unsetState(CreatureState.FLYING);
@@ -62,7 +73,7 @@ public class FlyController
 			PacketSendUtility.sendPacket(player, new S_STATUS(player));
 		}
 	}
-	
+
 	public boolean startFly() {
 		player.setFlyReuseTime(System.currentTimeMillis() + FLY_REUSE_TIME);
 		player.setState(CreatureState.FLYING);
@@ -73,7 +84,7 @@ public class FlyController
 		PacketSendUtility.broadcastPacket(player, new S_ACTION(player, EmotionType.START_EMOTE2, 0, 0), true);
 		return true;
 	}
-	
+
 	public void switchToGliding() {
 		if (!player.isInState(CreatureState.GLIDING)) {
 			player.setFlyReuseTime(System.currentTimeMillis() + FLY_REUSE_TIME);
@@ -84,6 +95,9 @@ public class FlyController
 			player.setFlyState(2);
 			player.getGameStats().updateStatsAndSpeedVisually();
 			player.getObserveController().addObserver(this.glideObserver);
+			if (player.isInsideZoneType(ZoneType.FLY)) {
+				player.getObserveController().addObserver(this.hybridObserver);
+			}
 			PacketSendUtility.sendPacket(player, new S_STATUS(player));
 		}
 	}
